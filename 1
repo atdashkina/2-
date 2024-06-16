@@ -1,0 +1,73 @@
+#include <iostream>
+#include <cmath>
+
+struct Line {
+    double A, B, C;
+};
+
+struct Point {
+    double x, y;
+};
+
+// Функция для вычисления расстояния от точки до прямой
+double distancePointToLine(const Line& line, const Point& point) {
+    return std::abs(line.A * point.x + line.B * point.y + line.C) / std::sqrt(line.A * line.A + line.B * line.B);
+}
+
+// Функция для нахождения точки пересечения двух прямых
+Point intersectionPoint(const Line& line1, const Line& line2) {
+    Point intersection;
+    double determinant = line1.A * line2.B - line2.A * line1.B;
+    
+    if (determinant == 0) {
+        std::cerr << "Прямые параллельны, точки пересечения нет." << std::endl;
+        return {0, 0};
+    }
+    
+    intersection.x = (line2.B * line1.C - line1.B * line2.C) / determinant;
+    intersection.y = (line1.A * line2.C - line2.A * line1.C) / determinant;
+    
+    return intersection;
+}
+
+// Функция для вычисления расстояния между двумя точками
+double distanceBetweenPoints(const Point& p1, const Point& p2) {
+    return std::sqrt((p2.x - p1.x) * (p2.x - p1.x) + (p2.y - p1.y) * (p2.y - p1.y));
+}
+
+// Функция для вычисления угла между двумя прямыми
+double angleBetweenLines(const Line& line1, const Line& line2) {
+    double tanTheta = std::abs((line2.A * line1.B - line1.A * line2.B) / (line1.A * line2.A + line1.B * line2.B));
+    return std::atan(tanTheta) * (180 / M_PI); // Конвертируем радианы в градусы
+}
+
+int main() {
+    Line line1, line2;
+    Point point;
+
+    std::cout << "Введите параметры первой прямой (A, B, C): ";
+    std::cin >> line1.A >> line1.B >> line1.C;
+    
+    std::cout << "Введите параметры второй прямой (A, B, C): ";
+    std::cin >> line2.A >> line2.B >> line2.C;
+    
+    std::cout << "Введите координаты точки (x, y): ";
+    std::cin >> point.x >> point.y;
+    
+    double distance1 = distancePointToLine(line1, point);
+    double distance2 = distancePointToLine(line2, point);
+    
+    std::cout << "Расстояние от точки до первой прямой: " << distance1 << std::endl;
+    std::cout << "Расстояние от точки до второй прямой: " << distance2 << std::endl;
+    
+    Point intersection = intersectionPoint(line1, line2);
+    std::cout << "Точка пересечения прямых: (" << intersection.x << ", " << intersection.y << ")" << std::endl;
+    
+    double distanceToIntersection = distanceBetweenPoints(point, intersection);
+    std::cout << "Расстояние от заданной точки до точки пересечения прямых: " << distanceToIntersection << std::endl;
+    
+    double angle = angleBetweenLines(line1, line2);
+    std::cout << "Угол между прямыми: " << angle << " градусов" << std::endl;
+    
+    return 0;
+}
