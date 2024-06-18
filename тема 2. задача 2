@@ -1,0 +1,115 @@
+#include <iostream>
+#include <cmath>
+
+// Структура для хранения координат вектора или точки
+struct Vector3 {
+    double x, y, z;
+
+    // Разница между двумя точками для получения вектора
+    Vector3 operator-(const Vector3& v) const {
+        return {x - v.x, y - v.y, z - v.z};
+    }
+
+    // Векторное произведение двух векторов
+    Vector3 cross(const Vector3& v) const {
+        return {
+            y * v.z - z * v.y,
+            z * v.x - x * v.z,
+            x * v.y - y * v.x
+        };
+    }
+
+    // Скалярное произведение двух векторов
+    double dot(const Vector3& v) const {
+        return x * v.x + y * v.y + z * v.z;
+    }
+
+    // Длина вектора
+    double length() const {
+        return std::sqrt(x * x + y * y + z * z);
+    }
+};
+
+// Угол между двумя векторами
+double angleBetween(const Vector3& v1, const Vector3& v2) {
+    return std::acos(v1.dot(v2) / (v1.length() * v2.length()));
+}
+
+// Проверка параллельности двух векторов
+bool areParallel(const Vector3& v1, const Vector3& v2) {
+    return v1.cross(v2).length() == 0;
+}
+
+// Расстояние между параллельными прямыми
+double distanceBetweenParallelLines(const Vector3& p1, const Vector3& d1, const Vector3& p2) {
+    Vector3 diff = p1 - p2;
+    Vector3 crossProduct = diff.cross(d1);
+    return crossProduct.length() / d1.length();
+}
+
+// Расстояние от точки до прямой
+double distancePointToLine(const Vector3& point, const Vector3& linePoint, const Vector3& lineDir) {
+    Vector3 diff = point - linePoint;
+    Vector3 crossProduct = diff.cross(lineDir);
+    return crossProduct.length() / lineDir.length();
+}
+
+// Точка пересечения двух прямых, если они пересекаются
+bool intersectionPoint(const Vector3& p1, const Vector3& d1, const Vector3& p2, const Vector3& d2, Vector3& intersection) {
+    Vector3 crossDir = d1.cross(d2);
+    double det = crossDir.length();
+
+    // Если определитель равен 0, прямые параллельны или совпадают
+    if (det == 0) return false;
+
+    Vector3 diff = p2 - p1;
+    double t1 = diff.cross(d2).dot(crossDir) / (det * det);
+    intersection = {p1.x + t1 * d1.x, p1.y + t1 * d1.y, p1.z + t1 * d1.z};
+    return true;
+}
+
+int main() {
+    // Координаты точки
+    Vector3 point = {1, 2, 3};
+
+    // Первая прямая задана точкой на ней и направляющим вектором
+    Vector3 p1 = {0, 0, 0};
+    Vector3 d1 = {1, 1, 1};
+
+    // Вторая прямая задана точкой на ней и направляющим вектором
+    Vector3 p2 = {1, 0, 0};
+    Vector3 d2 = {1, 1, -1};
+
+    // Угол между прямыми
+    double angle = angleBetween(d1, d2);
+    std::cout << "Угол между прямыми: " << angle * 180 / M_PI << " градусов" << std::endl;
+
+    // Проверка параллельности
+    if (areParallel(d1, d2)) {
+        std::cout << "Прямые параллельны" << std::endl;
+        double distance = distanceBetweenParallelLines(p1, d1, p2);
+        std::cout << "Расстояние между параллельными прямыми: " << distance << std::endl;
+    } else {
+        std::cout << "Прямые не параллельны" << std::endl;
+
+        Vector3 intersection;
+        if (intersectionPoint(p1, d1, p2, d2, intersection)) {
+            std::cout << "Прямые пересекаются в точке (" << intersection.x << ", " << intersection.y << ", " << intersection.z << ")" << std::endl;
+            double distance = distancePointToLine(point, intersection, {1, 0, 0});  // любой ненулевой вектор для второй аргумент в distancePointToLine, так как точка - это 0-мерный объект
+            std::cout << "Расстояние от заданной точки до точки пересечения: " << distance << std::endl;
+        } else {
+            std::cout << "Прямые не пересекаются" << std::endl;
+        }
+    }
+
+    // Расстояние от точки до первой прямой
+    double distance1 = distancePointToLine(point, p1, d1);
+    std::cout << "Расстояние от точки до первой прямой: " << distance1 << std::endl;
+
+    // Расстояние от точки до второй прямой
+    double distance2 = distancePointToLine(point, p2, d2);
+    std::cout << "Расстояние от точки до второй прямой: " << distance2 << std::endl;
+
+    return 0;
+}
+
