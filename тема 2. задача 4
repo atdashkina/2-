@@ -1,0 +1,44 @@
+import numpy as np
+
+def check_point_hyperbolic_cylinder(a, b, x, y):
+    return (x**2 / a**2) - (y**2 / b**2) == 1
+
+def check_plane_intersection(a, b, plane_normal, plane_point):
+    # Проверка пересечения плоскости с гиперболическим цилиндром
+    # Если уравнение плоскости ax + by + cz = d пересекает цилиндр
+    A, B, C = plane_normal
+    D = np.dot(plane_normal, plane_point)
+    return A != 0 and B != 0
+
+def check_line_intersection(a, b, line_point, line_dir):
+    # Проверка пересечения прямой с гиперболическим цилиндром
+    # Если уравнение линии x = x0 + t*dx, y = y0 + t*dy, z = z0 + t*dz пересекает цилиндр
+    x0, y0, z0 = line_point
+    dx, dy, dz = line_dir
+    
+    # Решение системы уравнений
+    A = (dx**2 / a**2) - (dy**2 / b**2)
+    B = (2 * x0 * dx / a**2) - (2 * y0 * dy / b**2)
+    C = (x0**2 / a**2) - (y0**2 / b**2) - 1
+    
+    discriminant = B**2 - 4 * A * C
+    return discriminant >= 0
+
+# Пример использования
+a = 5
+b = 3
+point = (5, 2, 4)
+
+plane_normal = (1, 1, 1)
+plane_point = (0, 0, 0)
+
+line_point = (1, 1, 1)
+line_dir = (1, 1, 1)
+
+belongs_cylinder = check_point_hyperbolic_cylinder(a, b, point[0], point[1])
+plane_intersects = check_plane_intersection(a, b, plane_normal, plane_point)
+line_intersects = check_line_intersection(a, b, line_point, line_dir)
+
+print(f"Точка {point} {'принадлежит' if belongs_cylinder else 'не принадлежит'} гиперболическому цилиндру")
+print(f"Плоскость {'пересекает' if plane_intersects else 'не пересекает'} гиперболический цилиндр")
+print(f"Прямая {'пересекает' if line_intersects else 'не пересекает'} гиперболический цилиндр")
