@@ -1,0 +1,41 @@
+import math
+
+def check_point_hyperbola(a, b, x, y):
+    return (x**2 / a**2) - (y**2 / b**2) == 1
+
+def hyperbola_properties(a, b):
+    # Полуоси
+    real_axis = a
+    imaginary_axis = b
+    
+    # Эксцентриситет
+    e = math.sqrt(1 + (b**2 / a**2))
+    
+    # Фокусы
+    foci = [(e * a, 0), (-e * a, 0)]
+    
+    # Расстояние между директрисами
+    directrices_distance = 2 * (a / e)
+    
+    return {
+        'real_axis': real_axis,
+        'imaginary_axis': imaginary_axis,
+        'eccentricity': e,
+        'foci': foci,
+        'directrices_distance': directrices_distance
+    }
+
+# Пример использования
+a = 5
+b = 3
+point = (5, 2)
+
+belongs = check_point_hyperbola(a, b, *point)
+props = hyperbola_properties(a, b)
+
+print(f"Точка {point} {'принадлежит' if belongs else 'не принадлежит'} гиперболе")
+print(f"Фокусы гиперболы: {props['foci']}")
+print(f"Длина действительной полуоси: {props['real_axis']}")
+print(f"Длина мнимой полуоси: {props['imaginary_axis']}")
+print(f"Эксцентриситет гиперболы: {props['eccentricity']}")
+print(f"Расстояние между директрисами: {props['directrices_distance']}")
